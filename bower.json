@@ -1,0 +1,27 @@
+{
+  "name": "jquery.plusslider",
+  "version": "1.5.13",
+  "description": "An agnostic jQuery content slider that is easily configurable",
+  "homepage": "https://github.com/JamyGolden/PlusSlider",
+  "main": "js/jquery.plusslider.js",
+  "keywords": [
+    "jquery",
+    "jquery plugin",
+    "slider",
+    "PlusSlider",
+    "carousel"
+  ],
+  "dependencies": {
+    "jquery": ">= 1.7.0",
+    "jquery.easing": ">= 1.3.0"
+  },
+  "authors": [
+    "Source code: Jamy Golden",
+    "Package: Jamy Golden"
+  ],
+  "licenses": "MIT",
+  "ignore": [
+    "node_modules",
+    "bower_components"
+  ]
+}
