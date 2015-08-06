@@ -1,6 +1,6 @@
 {
   "name": "jquery.plusslider",
-  "version": "1.5.13",
+  "version": "1.5.14",
   "description": "An agnostic jQuery content slider that is easily configurable",
   "homepage": "https://github.com/JamyGolden/PlusSlider",
   "main": "js/jquery.plusslider.js",
