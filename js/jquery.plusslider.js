@@ -1,12 +1,12 @@
 /*
  * PlusSlider
  * An agnostic jQuery content slider that is easily configurable
- * Version: "1.5.13"
+ * Version: "1.5.14"
  * Jamy Golden (http://css-plus.com/)
  * https://github.com/JamyGolden/PlusSlider
  * License: MIT
  */
- (function($) {
+ (function($, window, undefined) {
     "use strict";
 
     $.plusSlider = function(el, options) {
@@ -84,21 +84,44 @@
             base.$sliderItemsActive  = base.$sliderItems.eq( base.activeSlideIndex ); // References the current/active slide's jQuery object
             base.$sliderItemsCloneFirst; // First clone needed for infinite slide
             base.$sliderItemsCloneLast; // Last clone needed for infinite slide
-
-            // DOM manipulations
-            ////////////////////
-            base.$slider.insertBefore(base.$sliderList);
-            base.$sliderList.appendTo(base.$sliderContainer); // Basically wraps el
-            base.$sliderList.addClass(base.o.attrNames.slideListClass);
-            base.$sliderContainer.appendTo(base.$slider); // Append new Container
-            base.$sliderItems.addClass(base.o.attrNames.slideItemClass);
-            base.$sliderItems.eq(base.activeSlideIndex);
-            base.$sliderItems.addClass(base.o.attrNames.slideItemActiveClass);
         }
-
 
         // Public Methods
         // ==========================================================================
+        base.destroy = function () {
+            // Click events
+            base.$sliderControls.off('click.' + base.o.eventNamespace);
+            base.$arrows.off('click.' + base.o.eventNamespace);
+            base.$sliderList.off('click.' + base.o.eventNamespace);
+
+            // Hover events
+            base.$sliderList.off('click.hover');
+
+            // Keyup events
+            $(window).off('keyup.' + base.o.eventNamespace);
+
+            // Resize events
+            $(window).off('resize.' + base.o.eventNamespace);
+
+            base.$slider.removeAttr('style');
+            base.$sliderList.removeAttr('style');
+            base.$sliderContainer.removeAttr('style');
+            base.$sliderItems.removeAttr('style');
+            base.$sliderControls.removeAttr('style');
+
+            // Remove added classes
+            base.$sliderList.removeClass(base.o.attrNames.slideListClass);
+            base.$sliderList.removeClass(base.o.attrNames.elActiveClass);
+            base.$sliderItems.removeClass(base.o.attrNames.slideItemClass);
+            base.$sliderItems.removeClass(base.o.attrNames.slideItemActiveClass);
+
+            // Move element out of wrapper
+            base.$sliderList.insertBefore(base.$slider);
+
+            // Remove wrapper
+            base.$slider.remove();
+        }
+
         base.beginTimer = function() {
             base.clearTimer(); // Clear if it is already set
 
@@ -275,6 +298,16 @@
 
         base.init = function () {
             base._setupVars()
+            // DOM manipulations
+            ////////////////////
+            base.$slider.insertBefore(base.$sliderList);
+            base.$sliderList.appendTo(base.$sliderContainer); // Basically wraps el
+            base.$sliderList.addClass(base.o.attrNames.slideListClass);
+            base.$sliderContainer.appendTo(base.$slider); // Append new Container
+            base.$sliderItems.addClass(base.o.attrNames.slideItemClass);
+            base.$sliderItems.eq(base.activeSlideIndex);
+            base.$sliderItems.addClass(base.o.attrNames.slideItemActiveClass);
+
             // Handle dependant options
                 if (base.slideCount === 1) {
 
@@ -307,7 +340,7 @@
 
                     base.setSliderDimensions();
 
-                    $(window).resize(function() {
+                    $(window).on('resize.' + base.o.eventNamespace, function() {
 
                         // Reset timer
                         if (base.o.autoPlay) {
@@ -374,7 +407,7 @@
                     if ( base.o.paginationWidth ) base.$sliderControls.width( base.$sliderControls.find('.' + base.o.attrNames.pagiItemClass).outerWidth(true) * base.slideCount );
 
                     // Pagination functionality
-                    base.$sliderControls.find('.' + base.o.attrNames.pagiItemClass).click( function( ) {
+                    base.$sliderControls.find('.' + base.o.attrNames.pagiItemClass).on( 'click.' + base.o.eventNamespace, function( ) {
 
                         var controlIndex = $(this).index();
                         base.toSlide( controlIndex );
@@ -425,11 +458,11 @@
                         text: base.o.prevText
                     }).prependTo( base.$arrows );
 
-                    base.$arrows.find('.' + base.o.attrNames.arrowItemNextClass).click( function() {
+                    base.$arrows.find('.' + base.o.attrNames.arrowItemNextClass).on( 'click.' + base.o.eventNamespace, function() {
                         base.toSlide('next');
                     }); // .next.click
 
-                    base.$arrows.find('.' + base.o.attrNames.arrowItemPrevClass).click( function() {
+                    base.$arrows.find('.' + base.o.attrNames.arrowItemPrevClass).on( 'click.' + base.o.eventNamespace, function() {
                         base.toSlide('prev');
                     }); // prev.click
 
@@ -443,11 +476,11 @@
                     // Pause on hover
                     if ( base.o.pauseOnHover) {
 
-                        base.$sliderList.hover( function () {
+                        base.$sliderList.on( 'hover.' + base.o.eventNamespace, function () {
                             base.clearTimer();
                         }, function() {
                             base.beginTimer();
-                        }); // base.$sliderList.hover
+                        }); // base.$sliderList hover
 
                     }; //  base.o.pauseOnHover
 
@@ -456,13 +489,13 @@
                 // Keyboard navigation
                 if ( base.o.keyboardNavigation ) {
 
-                    base.$sliderList.click( function () {
+                    base.$sliderList.on( 'click.' + base.o.eventNamespace, function () {
                         $('.' + base.o.attrNames.elActiveClass).removeClass(base.o.attrNames.elActiveClass);
                         $(this).addClass(base.o.attrNames.elActiveClass);
 
                     });
 
-                    $(window).keyup( function ( e ) {
+                    $(window).on( 'keyup.' + base.o.eventNamespace, function ( e ) {
 
                         if ( base.$sliderList.is('.' + base.o.attrNames.elActiveClass) ) {
                             if ( e.keyCode == 39 ) { // Right arrow
@@ -547,7 +580,6 @@
             // Run initializer
             base.init();
         }
-
     };
 
     $.plusSlider.defaults = {
@@ -589,6 +621,7 @@
 
         // Slider namespace
         namespace: 'plusslider',
+        eventNamespace: 'plusslider',
 
         // Slider class names.
         // Note: All names are automatically prepended with namespace
@@ -633,4 +666,4 @@
 
     }; // $.fn.plusSlider
 
-})(jQuery);
+})(jQuery, window);
